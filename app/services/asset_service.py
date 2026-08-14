@@ -18,6 +18,7 @@ class AssetService:
             operating_system=asset_data.operating_system,
             status=asset_data.status,
             owner_id=owner_id,
+            subnet_id=asset_data.subnet_id,   # <-- Add this line
         )
 
         return asset_repository.create(db, asset)

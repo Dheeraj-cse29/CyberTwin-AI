@@ -23,3 +23,9 @@ class Subnet(Base):
         "Network",
         back_populates="subnets"
     )
+
+    assets = relationship(
+    "Asset",
+    back_populates="subnet",
+    cascade="all, delete-orphan"
+)

@@ -1,5 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
+from app.schemas.asset import AssetTopologyResponse
+
 
 class SubnetBase(BaseModel):
     name: str
@@ -18,5 +20,12 @@ class SubnetUpdate(BaseModel):
 class SubnetResponse(SubnetBase):
     id: int
     network_id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class SubnetTopologyResponse(SubnetBase):
+    id: int
+    assets: list["AssetTopologyResponse"] = []
 
     model_config = ConfigDict(from_attributes=True)

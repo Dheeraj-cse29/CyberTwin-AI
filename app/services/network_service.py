@@ -60,3 +60,10 @@ class NetworkService:
         network_id: int
     ):
         return self.repository.delete(db, network_id)
+
+    def get_network_topology(
+        self,
+        db: Session,
+        network_id: int
+    ):
+        return self.repository.get_by_id(db, network_id)

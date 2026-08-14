@@ -13,20 +13,25 @@ class Asset(Base):
     name = Column(String, nullable=False)
 
     asset_type = Column(
-        Enum(AssetType),
-        nullable=False
-    )
+    Enum(
+        AssetType,
+        values_callable=lambda enum: [e.value for e in enum]
+    ),
+    nullable=False
+)
 
     ip_address = Column(String, nullable=False)
 
     operating_system = Column(String, nullable=False)
 
     status = Column(
-        Enum(AssetStatus),
-        default=AssetStatus.ACTIVE,
-        nullable=False
-    )
-
+    Enum(
+        AssetStatus,
+        values_callable=lambda enum: [e.value for e in enum]
+    ),
+    default=AssetStatus.ACTIVE,
+    nullable=False
+)
     owner_id = Column(
         Integer,
         ForeignKey("users.id"),
@@ -36,4 +41,14 @@ class Asset(Base):
     owner = relationship(
         "User",
         back_populates="assets"
+    )
+
+    subnet_id = Column(
+    Integer,
+    ForeignKey("subnets.id"),
+    nullable=True
+    )
+    subnet = relationship(
+    "Subnet",
+    back_populates="assets"
     )

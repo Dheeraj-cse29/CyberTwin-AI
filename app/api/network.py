@@ -1,15 +1,19 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
 from app.core.security import get_current_user
 from app.models.user import User
-
 from app.database.session import get_db
+
 from app.schemas.network import (
     NetworkCreate,
     NetworkResponse,
     NetworkUpdate,
+    NetworkTopologyResponse,
 )
+
 from app.services.network_service import NetworkService
+
 
 router = APIRouter(
     prefix="/networks",
@@ -25,7 +29,6 @@ def create_network(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-
     return service.create_network(
         db=db,
         network=network,
@@ -52,6 +55,22 @@ def get_network(
         network_id
     )
 
+
+@router.get(
+    "/{network_id}/topology",
+    response_model=NetworkTopologyResponse
+)
+def get_network_topology(
+    network_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return service.get_network_topology(
+        db=db,
+        network_id=network_id
+    )
+
+
 @router.put("/{network_id}", response_model=NetworkResponse)
 def update_network(
     network_id: int,
@@ -65,6 +84,7 @@ def update_network(
         network
     )
 
+
 @router.delete("/{network_id}")
 def delete_network(
     network_id: int,
@@ -76,9 +96,6 @@ def delete_network(
         network_id
     )
 
-    return {
-        "message": "Network deleted successfully"
-    }
     return {
         "message": "Network deleted successfully"
     }
