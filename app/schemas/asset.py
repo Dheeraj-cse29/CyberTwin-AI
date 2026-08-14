@@ -1,4 +1,6 @@
-from pydantic import BaseModel, ConfigDict
+from ipaddress import ip_address
+
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.core.enums import AssetType, AssetStatus
 
@@ -9,6 +11,16 @@ class AssetBase(BaseModel):
     ip_address: str
     operating_system: str
     status: AssetStatus = AssetStatus.ACTIVE
+
+    @field_validator("ip_address")
+    @classmethod
+    def validate_ip_address(cls, value: str) -> str:
+        try:
+            ip_address(value)
+        except ValueError:
+            raise ValueError("Invalid IP address")
+
+        return value
 
 
 class AssetCreate(AssetBase):
@@ -23,6 +35,19 @@ class AssetUpdate(BaseModel):
     status: AssetStatus | None = None
     subnet_id: int | None = None
 
+    @field_validator("ip_address")
+    @classmethod
+    def validate_ip_address(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+
+        try:
+            ip_address(value)
+        except ValueError:
+            raise ValueError("Invalid IP address")
+
+        return value
+
 
 class AssetResponse(AssetBase):
     id: int
@@ -30,6 +55,7 @@ class AssetResponse(AssetBase):
     subnet_id: int | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
 
 class AssetTopologyResponse(BaseModel):
     id: int
