@@ -2,14 +2,18 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
+
 from app.schemas.subnet import (
     SubnetCreate,
     SubnetUpdate,
     SubnetResponse,
 )
+
 from app.services.subnet_service import SubnetService
-from app.core.security import get_current_user
+
+from app.auth.dependencies import get_current_user
 from app.models.user import User
+
 
 router = APIRouter(
     prefix="/subnets",
@@ -26,8 +30,9 @@ def create_subnet(
     db: Session = Depends(get_db),
 ):
     return service.create_subnet(
-        db,
-        subnet,
+        db=db,
+        subnet=subnet,
+        owner_id=current_user.id,
     )
 
 
@@ -36,7 +41,10 @@ def get_all_subnets(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return service.get_all_subnets(db)
+    return service.get_all_subnets(
+        db=db,
+        owner_id=current_user.id,
+    )
 
 
 @router.get("/{subnet_id}", response_model=SubnetResponse)
@@ -46,8 +54,9 @@ def get_subnet(
     db: Session = Depends(get_db),
 ):
     return service.get_subnet(
-        db,
-        subnet_id,
+        db=db,
+        subnet_id=subnet_id,
+        owner_id=current_user.id,
     )
 
 
@@ -59,9 +68,10 @@ def update_subnet(
     db: Session = Depends(get_db),
 ):
     return service.update_subnet(
-        db,
-        subnet_id,
-        subnet,
+        db=db,
+        subnet_id=subnet_id,
+        subnet=subnet,
+        owner_id=current_user.id,
     )
 
 
@@ -72,6 +82,7 @@ def delete_subnet(
     db: Session = Depends(get_db),
 ):
     return service.delete_subnet(
-        db,
-        subnet_id,
+        db=db,
+        subnet_id=subnet_id,
+        owner_id=current_user.id,
     )

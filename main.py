@@ -7,6 +7,15 @@ from app.api.auth import router as auth_router
 from app.api.users import router as users_router
 from app.api.assets import router as assets_router
 from app.api.network import router as network_router
+from app.api import attack
+from app.api import detection
+from app.api import risk
+from app.api import mitre
+from app.api import threat_hunting
+from app.api import analytics
+from app.api import digital_twin
+from app.api import ai
+from app.api import incidents
 
 # Logger
 from app.core.logger import logger
@@ -32,6 +41,7 @@ app = FastAPI(
     description="AI-Powered Digital Twin Platform for SOC Operations",
     version="1.0.0",
 )
+
 
 # ----------------------------
 # Register Exception Handlers
@@ -66,7 +76,15 @@ app.include_router(users_router)
 app.include_router(assets_router)
 app.include_router(network_router)
 app.include_router(subnet.router)
-
+app.include_router(attack.router)
+app.include_router(detection.router)
+app.include_router(risk.router)
+app.include_router(mitre.router)
+app.include_router(threat_hunting.router)
+app.include_router(analytics.router)
+app.include_router(digital_twin.router)
+app.include_router(ai.router)
+app.include_router(incidents.router)
 # ----------------------------
 # Startup Event
 # ----------------------------

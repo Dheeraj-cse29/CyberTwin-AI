@@ -16,3 +16,19 @@ class AssetStatus(str, Enum):
     INACTIVE = "Inactive"
     MAINTENANCE = "Maintenance"
     COMPROMISED = "Compromised"
+
+from enum import Enum
+
+
+class AttackType(str, Enum):
+    PORT_SCAN = "PORT_SCAN"
+    BRUTE_FORCE = "BRUTE_FORCE"
+    DOS = "DOS"
+    MALWARE = "MALWARE"
+    PHISHING = "PHISHING"
+
+
+class AttackStatus(str, Enum):
+    SIMULATED = "SIMULATED"
+    DETECTED = "DETECTED"
+    BLOCKED = "BLOCKED"

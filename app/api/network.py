@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.core.security import get_current_user
+from app.auth.dependencies import get_current_user
 from app.models.user import User
 from app.database.session import get_db
 
@@ -41,7 +41,10 @@ def get_all_networks(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return service.get_all_networks(db)
+    return service.get_all_networks(
+        db=db,
+        owner_id=current_user.id
+    )
 
 
 @router.get("/{network_id}", response_model=NetworkResponse)
@@ -50,10 +53,19 @@ def get_network(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return service.get_network(
-        db,
-        network_id
+    network = service.get_network(
+        db=db,
+        network_id=network_id,
+        owner_id=current_user.id
     )
+
+    if network is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Network does not exist."
+        )
+
+    return network
 
 
 @router.get(
@@ -65,10 +77,19 @@ def get_network_topology(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return service.get_network_topology(
+    network = service.get_network_topology(
         db=db,
-        network_id=network_id
+        network_id=network_id,
+        owner_id=current_user.id
     )
+
+    if network is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Network does not exist."
+        )
+
+    return network
 
 
 @router.put("/{network_id}", response_model=NetworkResponse)
@@ -78,11 +99,20 @@ def update_network(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return service.update_network(
-        db,
-        network_id,
-        network
+    updated_network = service.update_network(
+        db=db,
+        network_id=network_id,
+        network=network,
+        owner_id=current_user.id
     )
+
+    if updated_network is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Network does not exist."
+        )
+
+    return updated_network
 
 
 @router.delete("/{network_id}")
@@ -91,10 +121,17 @@ def delete_network(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    service.delete_network(
-        db,
-        network_id
+    deleted = service.delete_network(
+        db=db,
+        network_id=network_id,
+        owner_id=current_user.id
     )
+
+    if not deleted:
+        raise HTTPException(
+            status_code=404,
+            detail="Network does not exist."
+        )
 
     return {
         "message": "Network deleted successfully"
